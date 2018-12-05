@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<style type="text/css">
+	body {
+		position: relative;
+	}
+	.screen {
+		display: block;
+		margin: 50px;
+		width: 321px;
+		height: 475px;
+		position: relative;
+		background-color: #e7e7e8;
+		box-sizing: border-box;
+	}
+	.gr-screen {
+		width: 100%;
+		height: 260px;
+		background-color: #50cd72;
+		text-align: center;
+	}
+	.main-temp {
+		display: inline-block;
+		margin: auto;
+		margin-top: 120px;
+		font-size: 30px;
+		color: #fff;
+	}
+	.item-wr {
+		padding: 0 10px;
+	}
+	.item {
+		position: relative;
+		width: 100%;
+		height: 42px;
+		border-bottom: 1px solid #ccc;
+		font-size: 13px;
+		text-align: center;
+		vertical-align: middle;
+		color: #ccc;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	form {
+		position: absolute;
+		top: 0;
+		left: 400px;
+	}
+	.form-check-label {
+		display: block;
+		background-color: #e3e3e3;
+		padding: 0.5rem 2rem;
+		border-radius: 3px;
+		margin-bottom: 0.5rem;
+		font-weight: bold;
+		text-transform: uppercase;
+		text-align: center;
+	}
+	input:checked + label {
+		color: #26a12b;
+	}
+	.form-check-input {
+		display: none;
+	}
+	.icon {
+		height: 40px;
+		width: auto;
+	}
+
+</style>
+
+</head>
+<body>
+
+	<div class="screen"> 
+		<div class="gr-screen" id="gr-screen">
+			<!-- <span class="main-temp"></span> -->
+		</div>
+		<div class="item-wr" id="item-wr">
+<!-- 		<div class="item">
+			<span class="dateTime">222</span>
+			<img class="icon">222</img>
+			<span class="temp">222</span>
+		</div> -->
+	</div>
+</div>
+
+<form>
+	<div class="form-check">
+		<input class="form-check-input" type="radio" name="exampleRadios" id="minsk" value="Minsk" checked>
+		<label class="form-check-label" for="minsk">
+			Minsk
+		</label>
+	</div>
+	<div class="form-check">
+		<input class="form-check-input" type="radio" name="exampleRadios" id="brest" value="Brest">
+		<label class="form-check-label" for="brest">
+			Brest
+		</label>
+	</div>
+	<div class="form-check">
+		<input class="form-check-input" type="radio" name="exampleRadios" id="molodechno" value="Molodechno">
+		<label class="form-check-label" for="molodechno">
+			Molodechno
+		</label>
+	</div>
+</form>
+
+<script type="text/javascript">
+
+	window.addEventListener("load", function(){
+
+		var grScreen = document.getElementById('gr-screen');
+		var itemWr = document.getElementById('item-wr');
+		var inputAll = document.getElementsByTagName('input');
+		
+		function getAjaxJson(zapros){
+			var req = new XMLHttpRequest();
+			req.onload = function(){
+				var responseJson = JSON.parse(req.responseText);
+				console.log(responseJson);
+				var list = responseJson.list;
+				console.log(list);
+				for (var i = 5; i < list.length; i+=8) {
+
+					var item = document.createElement('div');
+					item.className = 'item';
+					itemWr.appendChild(item);
+
+					var dateTime =  document.createElement('span');
+					dateTime.className = 'dateTime';
+					dateTime.textContent = list[i].dt_txt;
+					item.appendChild(dateTime);
+
+					var icon =  document.createElement('img');
+					icon.className = 'icon';
+					icon.setAttribute('src', 'icons/' + list[i].weather[0].icon + '.png')
+					item.appendChild(icon);
+
+					var temp = document.createElement('span');
+					temp.className = 'temp';
+					temp.textContent = list[i].main.temp + '°C';
+					item.appendChild(temp);
+
+				}
+				var mainTemp = document.createElement('span');
+				mainTemp.className = 'main-temp';
+				var mainT = document.getElementsByClassName('item')[0].children[2];
+				mainTemp.textContent = mainT.textContent;
+				console.log(mainT);
+				grScreen.appendChild(mainTemp);
+			}
+			req.open("GET",'https://api.openweathermap.org/data/2.5/forecast?q='+zapros+',by&units=metric&APPID=37d8262233837dd976d488fc35f24bd3',true);
+	req.send();
+};
+
+getAjaxJson('Minsk');
+
+for(var i = 0; i < inputAll.length; i++) {
+	a = inputAll[i];
+	inputAll[i].onchange = function(){
+		var zapros = document.querySelector('input[name = "exampleRadios"]:checked').value;
+		console.log(zapros);
+		itemWr.innerHTML = "";
+		grScreen.innerHTML = "";
+		getAjaxJson(zapros);
+		}
+	}
+});
+	
+</script>
+
+</body>
+
+
+</html>
